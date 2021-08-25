@@ -1,6 +1,7 @@
 ## Getting Started
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+For the base path / directory please change in /src/Constant.java
+Running /src/App.java for the result
 
 ## Folder Structure
 

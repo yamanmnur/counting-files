@@ -12,11 +12,10 @@ import java.util.stream.Stream;
 
 public class App {
 
-    private static String BASE_PATH = "D:\\PROJECTBIRTEK\\SIMPLEWEBAPP\\TESTKERJAAAPS\\";
 
     private static Stream<Path> files;
     public static void main(String[] args) throws Exception {
-        String thePath = BASE_PATH+"DropsuiteTest";
+        String thePath = Constant.BASEPATH;
 
         files = Files.walk(Paths.get(thePath));
         
@@ -40,7 +39,7 @@ public class App {
         Map<String, List<String>> contentMap = dataFiles.stream().collect(Collectors.groupingBy(v -> v));
             
         List<Content> content = new ArrayList<>();
-        
+
         for (Map.Entry<String, List<String>> entry: contentMap.entrySet()) {
             Content model = new Content(entry.getKey(),entry.getValue().size());
             content.add(model);

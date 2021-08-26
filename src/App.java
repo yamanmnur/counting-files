@@ -35,10 +35,9 @@ public class App {
             List<Content> data = getContent(dataFiles);
 
             Content maxContent = data.stream().max(Comparator.comparing(Content::getLength)).get();
-            System.out.println("MAX "+ maxContent.getContent() );
+            System.out.println("The Biggest Counting Content : "+ maxContent.getContent() );
 
         } catch (Exception e) {
-            e.printStackTrace();
             System.out.println( "Theres No Folder In Path");
         }
     }
@@ -52,7 +51,7 @@ public class App {
             Content model = new Content(entry.getKey(),entry.getValue().size());
             content.add(model);
 
-            System.out.println("There are " + entry.getValue().size() + " with content " + entry.getKey());
+            System.out.println("There are " + entry.getValue().size() + " files with content " + entry.getKey());
         }
 
         return content;

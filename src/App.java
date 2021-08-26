@@ -18,8 +18,10 @@ public class App {
     public static void main(String[] args) throws Exception {
         Scanner userInput = new Scanner(System.in);
         String thePath = "";
+
         System.out.println("Example Directory : D:\\PROJECT\\DropSuiteTest");
         System.out.println("Please Input Directory : ");
+        
         thePath = userInput.next();
         userInput.close();
 

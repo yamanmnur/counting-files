@@ -1,0 +1,159 @@
+-- STEP 1
+-- CREATE VIEW view_user_group
+
+BEGIN;
+
+-- CREATE VIEW "view_user_group" -------------------------------
+CREATE OR REPLACE VIEW "public"."view_user_group" AS  SELECT users.mark,
+    count(users.mark) AS count_mark
+   FROM users
+  GROUP BY users.mark;;
+-- -------------------------------------------------------------
+
+COMMIT;
+
+-- STEP 2
+-- CREATE FUNCTION get_mark
+
+CREATE OR REPLACE FUNCTION public.get_mark(labels character varying, querys character varying)
+ RETURNS TABLE(marks text, counts numeric)
+ LANGUAGE plpgsql
+AS $function$
+begin
+     return query execute format('select ' 
+    || 'table1.marks, '
+    || 'sum(table1.count_mark) as counts '
+    || 'from ( '
+    || 'select '
+    || ' ''%s'' as marks, '
+    || 'SUM(count_mark) as count_mark '
+    || 'from view_user_group '
+     || 'where %s ' 
+     ||'  group by count_mark '
+     ||') as table1 GROUP by table1.marks',labels,querys);
+end;
+$function$
+
+-- STEP 3
+-- QUERYING
+
+select 
+cast(mark as text),
+cast(count_mark as numeric)
+from view_user_group UNION
+select 
+tables_function.*
+from
+get_mark('A+B', 'mark = ''A'' or mark = ''B''') as tables_function union
+select 
+tables_function.*
+from
+get_mark('A+C', 'mark = ''A'' or mark = ''C''') as tables_function union
+select 
+tables_function.*
+from
+get_mark('B+C', 'mark = ''B'' or mark = ''C''') as tables_function union
+select 
+tables_function.*
+from
+get_mark('A+B+C', 'mark = ''A'' or mark = ''B'' or mark = ''C'' ') as tables_function
+
+
+-- QUERY BOOK USER
+--
+
+-- CREATE FUNCTION FOR GET LATEST BOOK USER
+
+BEGIN;
+
+-- CREATE FUNCTION "get_latest_books( varchar )" ---------------
+CREATE OR REPLACE FUNCTION public.get_latest_books(user_ids character varying)
+ RETURNS character varying
+ LANGUAGE plpgsql
+AS $function$
+declare
+   booksname character VARYING;
+begin
+   select 
+books.name into booksname
+from books
+join users on cast(users.id as character varying) = books.user_id 
+where cast(users.id as character varying) = user_ids 
+order by books.date desc limit 1;
+
+   return booksname;
+end;
+$function$;
+-- -------------------------------------------------------------
+
+COMMIT;
+
+
+BEGIN;
+
+-- CREATE FUNCTION "get_latest_books_date( varchar )" ----------
+CREATE OR REPLACE FUNCTION public.get_latest_books_date(user_ids character varying)
+ RETURNS date
+ LANGUAGE plpgsql
+AS $function$
+declare
+   booksdate date;
+begin
+   select 
+books.date into booksdate
+from books
+join users on cast(users.id as character varying) = books.user_id 
+where cast(users.id as character varying) = user_ids 
+order by books.date desc limit 1;
+
+   return booksdate;
+end;
+$function$;
+-- -------------------------------------------------------------
+
+COMMIT;
+
+
+-- ENDS CREATE FUNCTION
+
+--- QUERY THE TABLE
+select 
+users.name,
+get_latest_books(cast(users.id as character varying) ) as books_name,
+get_latest_books_date(cast(users.id as character varying) ) as books_date
+from users
+join books on books.user_id = cast(users.id as character varying) 
+group by 
+users.name,
+get_latest_books(cast(users.id as character varying) ) ,
+get_latest_books_date(cast(users.id as character varying) ) 
+-- END QUERY
+
+
+-- THIS IS THE TABLE THAT I USE
+BEGIN;
+
+-- CREATE TABLE "books" ----------------------------------------
+CREATE TABLE "public"."books" ( 
+	"id" Character Varying( 100 ) NOT NULL,
+	"name" Character Varying( 100 ),
+	"date" Date,
+	"user_id" Character Varying( 100 ),
+	CONSTRAINT "unique_books_id" UNIQUE( "id" ) );
+ ;
+-- -------------------------------------------------------------
+
+COMMIT;
+
+BEGIN;
+
+-- CREATE TABLE "users" ----------------------------------------
+CREATE TABLE "public"."users" ( 
+	"id" Integer NOT NULL,
+	"name" Character Varying( 100 ),
+	"mark" Character Varying( 100 ),
+	CONSTRAINT "unique_users_id" UNIQUE( "id" ) );
+ ;
+-- -------------------------------------------------------------
+
+COMMIT;

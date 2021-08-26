@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -15,7 +16,12 @@ public class App {
 
     private static Stream<Path> files;
     public static void main(String[] args) throws Exception {
-        String thePath = Constant.BASEPATH;
+        Scanner userInput = new Scanner(System.in);
+        String thePath = "";
+        System.out.println("Example Directory : D:\\PROJECT\\DropSuiteTest");
+        System.out.println("Please Input Directory : ");
+        thePath = userInput.next();
+        userInput.close();
 
         files = Files.walk(Paths.get(thePath));
         
